@@ -2,11 +2,12 @@
 
 from distutils.core import setup
 from catkin_pkg.python_setup import generate_distutils_setup
+import os
 
 # fetch values from package.xml
 setup_args = generate_distutils_setup(
     packages=['recorder'],
-    package_dir={'': 'src'},
+    package_dir={'recorder': os.path.join('src', 'recorder')},
 )
 
 setup(**setup_args)

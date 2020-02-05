@@ -1,7 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import cv2
 import tempfile
+import datetime
 
 
 class VideoRecorder:
@@ -38,10 +39,7 @@ class VideoRecorder:
             print("Error: video recorder is currently recording")
             return
 
-        if not filename:
-            self.filename = tempfile.mktemp(prefix='this_is_a_unique_temp_audio_file_', suffix='.'+self.vid_type, dir=filepath)
-        else:
-            self.filename = filepath+"/"+filename
+        self.filename = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + '.' + self.vid_type
 
         self.out = cv2.VideoWriter(self.filename, self.VIDEO_TYPE[self.vid_type], self.frames_per_second,
                                        self.STD_DIMENSIONS[self.video_dimensions], True)
