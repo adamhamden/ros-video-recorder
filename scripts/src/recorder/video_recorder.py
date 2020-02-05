@@ -2,15 +2,13 @@
 
 import cv2
 import tempfile
-from src.recorder.recorder import Recorder
 
 
-class VideoRecorder(Recorder):
+class VideoRecorder:
 
     VIDEO_TYPE = {
-        'avi': cv2.VideoWriter_fourcc(*'XVID'),
-        # 'mp4': cv2.VideoWriter_fourcc(*'H264'),
-        'mp4': cv2.VideoWriter_fourcc(*'XVID'),
+        'avi': cv2.VideoWriter_fourcc(*'mpeg'),
+        'mp4': cv2.VideoWriter_fourcc(*'mpeg')
     }
 
     STD_DIMENSIONS = {
@@ -26,10 +24,11 @@ class VideoRecorder(Recorder):
             frames_per_second=30,
             video_dimensions='480p'
     ):
-        super(VideoRecorder, self).__init__()
+
         self.vid_type = vid_type
         self.frames_per_second = frames_per_second
         self.video_dimensions = video_dimensions
+        self.is_recording = False
         self.filename = None
         self.out = None
 
@@ -45,7 +44,7 @@ class VideoRecorder(Recorder):
             self.filename = filepath+"/"+filename
 
         self.out = cv2.VideoWriter(self.filename, self.VIDEO_TYPE[self.vid_type], self.frames_per_second,
-                                       self.STD_DIMENSIONS[self.video_dimensions])
+                                       self.STD_DIMENSIONS[self.video_dimensions], True)
         self.is_recording = True
 
     def add_data(self, image_frame):
@@ -57,9 +56,12 @@ class VideoRecorder(Recorder):
         self.out.write(image_frame)
 
     def stop_recording(self):
+
         if not self.is_recording:
             print("Error: video recorder is currently not recording")
             return
 
         self.out.release()
+        self.out = None
+        self.filename = None
         self.is_recording = False
