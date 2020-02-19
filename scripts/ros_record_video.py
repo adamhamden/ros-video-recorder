@@ -6,6 +6,7 @@ from std_msgs.msg import String
 from recorder.video_recorder import VideoRecorder
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
+import os
 
 
 class ROSVideoRecord:
@@ -14,8 +15,12 @@ class ROSVideoRecord:
 
         self.node = rospy.init_node('video_recorder', anonymous=True)
         self.bridge = CvBridge()
-        self.image_sub = rospy.Subscriber("camera/color/image_raw", Image, self.image_callback)
-        self.command_sub = rospy.Subscriber("video/command", String, self.command_callback)
+
+        print("Image topic: "+rospy.get_param("image_topic"))
+        print("Command topic: "+rospy.get_param("command_topic"))
+
+        self.image_sub = rospy.Subscriber(rospy.get_param("image_topic"), Image, self.image_callback)
+        self.command_sub = rospy.Subscriber(rospy.get_param("command_topic"), String, self.command_callback)
         self.is_recording = False
         self.recorder = None
 
@@ -40,25 +45,30 @@ class ROSVideoRecord:
     def start_recording(self):
 
         if self.recorder:
+            print("Recording already in progress")
             return
 
+        print("Starting a new recorder object")
         self.recorder = VideoRecorder()
-        self.recorder.start_recording()
+        self.recorder.start_recording(file_path="/root/shared/catkin_ws/src/ros-video-recorder/video_repo")
         self.is_recording = True
 
     def stop_recording(self):
 
         if not self.recorder:
+            print("No recording in progress")
             return
 
+        print("Ending recording")
         self.is_recording = False
-        self.recorder.stop_recording()
+        self.recorder.stop_recording(upload_credentials="/root/shared/catkin_ws/src/ros-video-recorder/aws_config.yaml")
         self.recorder = None
 
 
 if __name__ == "__main__":
 
     ros_recorder = ROSVideoRecord()
+
     try:
         rospy.spin()
     except KeyboardInterrupt:

@@ -1,0 +1,12 @@
+<launch>
+
+    <!-- Load parameters from a yaml file -->
+    <arg name="image_input_topic" default="camera/color/image_raw"/>
+    <arg name="command_input_topic" default="video/command"/>
+
+    <param name="image_topic" type="str" value="$(arg image_input_topic)"/>
+    <param name="command_topic" type="str" value="$(arg command_input_topic)"/>
+
+    <node pkg="ros_video_recorder" type="ros_record_video.py" name="ros_record_video" output="screen" args="$(arg image_input_topic) $(arg command_input_topic)"/>
+
+</launch>
